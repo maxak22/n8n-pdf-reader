@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DocuVoice</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#080b10;
+  --surface:#0d1117;
+  --surface2:#111520;
+  --border:#1e2535;
+  --border2:#2a3348;
+  --text:#e8eaf0;
+  --text2:#8b90a0;
+  --text3:#555c70;
+  --gold:#c9a84c;
+  --gold2:#e8c97a;
+  --gold-glow:rgba(201,168,76,0.15);
+  --gold-dim:rgba(201,168,76,0.06);
+  --green:#3ecf8e;
+  --red:#f87171;
+  --display:'Playfair Display',Georgia,serif;
+  --body:'Outfit',sans-serif;
+}
+
+html{font-size:16px;scroll-behavior:smooth}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--body);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:52px 20px 80px;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* Ambient background orbs */
+body::before{
+  content:'';
+  position:fixed;
+  top:-200px;left:50%;
+  transform:translateX(-50%);
+  width:800px;height:500px;
+  background:radial-gradient(ellipse,rgba(201,168,76,0.07) 0%,transparent 70%);
+  pointer-events:none;
+  z-index:0;
+}
+body::after{
+  content:'';
+  position:fixed;
+  bottom:-100px;right:-100px;
+  width:500px;height:500px;
+  background:radial-gradient(ellipse,rgba(62,207,142,0.04) 0%,transparent 70%);
+  pointer-events:none;
+  z-index:0;
+}
+
+.wrap{width:100%;max-width:580px;position:relative;z-index:1}
+
+/* ── HEADER ── */
+.header{text-align:center;padding:0 0 52px;animation:rise 0.9s cubic-bezier(.16,1,.3,1) both}
+
+.logo-mark{
+  width:56px;height:56px;
+  border:1px solid var(--border2);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 28px;
+  position:relative;
+  background:var(--surface);
+}
+.logo-mark::before{
+  content:'';
+  position:absolute;inset:-1px;
+  border-radius:50%;
+  background:conic-gradient(var(--gold) 0deg,transparent 120deg,transparent 240deg,var(--gold) 360deg);
+  mask:radial-gradient(circle at center,transparent 26px,black 27px);
+  -webkit-mask:radial-gradient(circle at center,transparent 26px,black 27px);
+  animation:spin 8s linear infinite;
+}
+.logo-mark svg{width:22px;height:22px;opacity:0.8}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+
+h1{
+  font-family:var(--display);
+  font-weight:400;
+  font-size:48px;
+  letter-spacing:0.04em;
+  color:var(--text);
+  line-height:1;
+  margin-bottom:10px;
+}
+h1 span{
+  font-style:italic;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.subtitle{
+  font-family:var(--body);
+  font-size:13px;
+  font-weight:300;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--text3);
+}
+
+/* ── CARDS ── */
+.panel{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:28px 32px;
+  margin-bottom:12px;
+  position:relative;
+  overflow:hidden;
+  animation:rise 0.7s cubic-bezier(.16,1,.3,1) both;
+  transition:border-color 0.3s;
+}
+.panel:hover{border-color:var(--border2)}
+.panel:nth-child(1){animation-delay:0.05s}
+.panel:nth-child(2){animation-delay:0.12s}
+.panel:nth-child(3){animation-delay:0.19s}
+
+.panel::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(to right,transparent,var(--gold-glow),transparent);
+}
+
+/* Config panel */
+.config-panel{padding:24px 32px}
+
+.panel-head{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:24px;
+}
+.step-badge{
+  font-family:var(--body);
+  font-size:11px;
+  font-weight:300;
+  letter-spacing:0.12em;
+  color:var(--gold);
+  background:var(--gold-dim);
+  border:1px solid rgba(201,168,76,0.2);
+  padding:4px 10px;
+  border-radius:20px;
+  transition:all 0.4s;
+  white-space:nowrap;
+}
+.step-badge.done{
+  color:var(--green);
+  background:rgba(62,207,142,0.08);
+  border-color:rgba(62,207,142,0.25);
+}
+.panel-title{
+  font-family:var(--display);
+  font-size:20px;
+  font-weight:400;
+  color:var(--text);
+  letter-spacing:0.01em;
+}
+
+.field-label{
+  font-family:var(--body);
+  font-size:11px;
+  font-weight:300;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:8px;
+  display:block;
+}
+
+.input-wrap{position:relative;margin-bottom:12px}
+.input-wrap:last-of-type{margin-bottom:0}
+input[type=text]{
+  width:100%;
+  padding:12px 16px 12px 40px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-family:var(--body);
+  font-size:13px;
+  font-weight:300;
+  color:var(--text);
+  outline:none;
+  transition:border-color 0.25s,box-shadow 0.25s;
+}
+input[type=text]:focus{
+  border-color:rgba(201,168,76,0.4);
+  box-shadow:0 0 0 3px rgba(201,168,76,0.06);
+}
+input[type=text]::placeholder{color:var(--text3);font-size:12px}
+.input-icon{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  opacity:0.35;pointer-events:none;
+}
+
+/* Drop zone */
+.dropzone{
+  border:1px dashed var(--border2);
+  border-radius:12px;
+  padding:32px 20px;
+  text-align:center;
+  cursor:pointer;
+  background:var(--surface2);
+  transition:all 0.3s;
+  position:relative;
+  overflow:hidden;
+  margin-bottom:16px;
+}
+.dropzone::after{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,var(--gold-dim),transparent 70%);
+  opacity:0;
+  transition:opacity 0.3s;
+}
+.dropzone:hover{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.03)}
+.dropzone:hover::after{opacity:1}
+.dropzone input{display:none}
+
+.dz-icon-wrap{
+  width:52px;height:52px;
+  border-radius:12px;
+  border:1px solid var(--border2);
+  background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 14px;
+  position:relative;z-index:1;
+  transition:border-color 0.3s;
+}
+.dropzone:hover .dz-icon-wrap{border-color:rgba(201,168,76,0.4)}
+.dz-title{font-size:15px;font-weight:300;color:var(--text2);margin-bottom:5px;position:relative;z-index:1}
+.dz-hint{font-size:12px;font-weight:200;color:var(--text3);letter-spacing:0.06em;position:relative;z-index:1}
+
+.files-chip{
+  display:none;align-items:center;gap:8px;
+  margin-top:12px;padding:6px 14px;
+  background:rgba(201,168,76,0.08);
+  border:1px solid rgba(201,168,76,0.2);
+  border-radius:20px;
+  font-size:12px;font-weight:300;
+  color:var(--gold);
+  width:fit-content;margin-left:auto;margin-right:auto;
+  position:relative;z-index:1;
+}
+.files-chip.on{display:inline-flex}
+.chip-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+
+.fscroll{
+  max-height:128px;overflow-y:auto;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--surface2);
+  display:none;margin-bottom:16px;
+}
+.fscroll.on{display:block}
+.fscroll::-webkit-scrollbar{width:4px}
+.fscroll::-webkit-scrollbar-track{background:transparent}
+.fscroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.frow{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 16px;
+  border-bottom:1px solid var(--border);
+  transition:background 0.15s;
+}
+.frow:last-child{border-bottom:none}
+.frow:hover{background:rgba(255,255,255,0.02)}
+.fdot{width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:0.6;flex-shrink:0}
+.fname{font-size:12px;font-weight:300;color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fsize{font-size:11px;color:var(--text3);flex-shrink:0}
+
+/* Buttons */
+.btn{
+  width:100%;padding:14px 20px;
+  border:none;border-radius:12px;
+  font-family:var(--body);
+  font-size:12px;font-weight:300;letter-spacing:0.16em;text-transform:uppercase;
+  cursor:pointer;transition:all 0.3s;
+  position:relative;overflow:hidden;
+}
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold),#a07830);
+  color:#1a1000;
+}
+.btn-gold::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  opacity:0;transition:opacity 0.3s;
+}
+.btn-gold:hover::before{opacity:1}
+.btn-gold:active{transform:scale(0.99)}
+.btn-gold:disabled{opacity:0.3;cursor:not-allowed}
+.btn-gold span{position:relative;z-index:1;font-weight:400}
+.btn-gold.ok{background:linear-gradient(135deg,#3ecf8e,#2a9966);color:#001a0d}
+.btn-gold.ok::before{display:none}
+
+.btn-ghost{
+  background:none;
+  border:1px solid var(--border2);
+  border-radius:10px;
+  padding:10px 24px;
+  font-family:var(--body);font-size:11px;font-weight:300;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--text3);cursor:pointer;
+  transition:all 0.25s;display:none;margin-top:14px;
+}
+.btn-ghost:hover{border-color:var(--text3);color:var(--text2)}
+.btn-ghost.on{display:inline-block}
+
+/* Mic */
+.mic-area{text-align:center;padding:8px 0}
+
+.mic-outer{
+  width:96px;height:96px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;
+  margin-bottom:20px;
+}
+.mic-outer::before{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  border:1px solid var(--border2);
+  transition:border-color 0.3s;
+}
+.mic-outer::after{
+  content:'';position:absolute;inset:8px;border-radius:50%;
+  background:var(--surface2);
+  transition:all 0.3s;
+}
+.mic-outer:hover::before{border-color:rgba(201,168,76,0.5)}
+.mic-outer:hover::after{background:rgba(201,168,76,0.06)}
+.mic-outer.rec::before{border-color:rgba(248,113,113,0.6);animation:rpulse 1.6s ease infinite}
+.mic-outer.rec::after{background:rgba(248,113,113,0.08)}
+.mic-outer.done::before{border-color:rgba(62,207,142,0.5)}
+.mic-outer.done::after{background:rgba(62,207,142,0.06)}
+
+.mic-inner{position:relative;z-index:1}
+
+@keyframes rpulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,0.3)}
+  50%{box-shadow:0 0 0 16px rgba(248,113,113,0)}
+}
+
+.mic-lbl{font-family:var(--display);font-size:16px;font-weight:400;color:var(--text2);margin-bottom:5px}
+.mic-sub{font-size:12px;font-weight:200;color:var(--text3);letter-spacing:0.08em}
+
+/* Status */
+.status{
+  font-size:12px;font-weight:300;letter-spacing:0.08em;
+  color:var(--text3);text-align:center;
+  margin-top:12px;min-height:18px;transition:color 0.25s;
+}
+.status.err{color:var(--red)}
+.status.ok{color:var(--green)}
+
+/* Answer */
+.answer-wrap{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:32px;
+  margin-bottom:12px;
+  display:none;
+  animation:rise 0.6s cubic-bezier(.16,1,.3,1) both;
+  position:relative;overflow:hidden;
+}
+.answer-wrap.on{display:block}
+.answer-wrap::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(to right,transparent,var(--gold),var(--gold2),transparent);
+}
+
+.answer-label{
+  display:flex;align-items:center;gap:12px;
+  font-size:11px;font-weight:300;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:18px;
+}
+.answer-label::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(201,168,76,0.3),transparent)}
+
+.answer-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:blink 2s infinite}
+
+.answer-text{
+  font-family:var(--display);
+  font-size:18px;font-weight:400;
+  line-height:1.85;
+  color:var(--text);
+  letter-spacing:0.01em;
+}
+
+@keyframes rise{
+  from{opacity:0;transform:translateY(18px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* Divider */
+.divider{
+  display:flex;align-items:center;gap:12px;
+  margin:4px 0 20px;
+}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.div-gem{
+  width:6px;height:6px;
+  background:var(--gold);
+  transform:rotate(45deg);
+  opacity:0.5;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" style="color:var(--gold)"/>
+      </svg>
+    </div>
+    <h1>Docu<span>Voice</span></h1>
+    <p class="subtitle">Intelligent Document Query &nbsp;·&nbsp; RAG</p>
+  </div>
+
+  <!-- Config -->
+  <div class="panel config-panel">
+    <div class="divider"><div class="div-gem"></div></div>
+    <span class="field-label">Webhook Configuration</span>
+    <div class="input-wrap">
+      <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="#8b90a0" stroke-width="1.5" stroke-linecap="round"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#8b90a0" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input type="text" id="uploadUrl" placeholder="Upload webhook — /webhook/upload-pdfs">
+    </div>
+    <div class="input-wrap">
+      <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="#8b90a0" stroke-width="1.5"/><path d="m21 21-4.35-4.35" stroke="#8b90a0" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input type="text" id="queryUrl" placeholder="Query webhook — /webhook/query-pdf">
+    </div>
+  </div>
+
+  <!-- Upload -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="step-badge" id="b1">Step 01</span>
+      <span class="panel-title">Index your documents</span>
+    </div>
+
+    <div class="dropzone" onclick="document.getElementById('pdfInput').click()">
+      <input type="file" id="pdfInput" accept=".pdf" multiple onchange="onFiles(this)">
+      <div class="dz-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M14 2v6h6M12 18v-6M9 15l3-3 3 3" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="dz-title">Drop PDF files here or click to browse</div>
+      <div class="dz-hint">30–40 files supported &nbsp;·&nbsp; Any size</div>
+      <div class="files-chip" id="fchip">
+        <div class="chip-dot"></div>
+        <span id="fcount"></span>
+      </div>
+    </div>
+
+    <div class="fscroll" id="flist"></div>
+
+    <button class="btn btn-gold" id="upBtn" onclick="uploadPDFs()" disabled>
+      <span id="upTxt">Index Knowledge Base</span>
+    </button>
+    <div class="status" id="upSt"></div>
+  </div>
+
+  <!-- Voice -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="step-badge" id="b2">Step 02</span>
+      <span class="panel-title">Ask by voice</span>
+    </div>
+
+    <div class="mic-area">
+      <div class="mic-outer" id="mring" onclick="toggleRec()">
+        <div class="mic-inner">
+          <svg width="24" height="28" viewBox="0 0 24 28" fill="none" id="msvg">
+            <rect x="7" y="1" width="10" height="16" rx="5" stroke="var(--text2)" stroke-width="1.5"/>
+            <path d="M3 14c0 4.97 4.03 9 9 9s9-4.03 9-9" stroke="var(--text2)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="12" y1="23" x2="12" y2="27" stroke="var(--text2)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="8" y1="27" x2="16" y2="27" stroke="var(--text2)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="mic-lbl" id="mlbl">Tap to record</div>
+      <div class="mic-sub" id="msub">Tap again to stop &amp; submit</div>
+      <br>
+      <button class="btn-ghost" id="reRecBtn" onclick="reRec()">Re-record</button>
+    </div>
+    <div class="status" id="qSt"></div>
+  </div>
+
+  <!-- Answer -->
+  <div class="answer-wrap" id="ansPanel">
+    <div class="answer-label">
+      <div class="answer-dot"></div>
+      Answer
+    </div>
+    <div class="answer-text" id="ansTxt"></div>
+  </div>
+
+</div>
+<script>
+let pdfs=[],blob=null,mr=null,chunks=[],recording=false;
+const mime='audio/webm;codecs=opus';
+
+function onFiles(inp){
+  const newFiles = Array.from(inp.files);
+  pdfs = [...pdfs, ...newFiles]; // accumulate instead of replace
+  const n = pdfs.length;
+  const chip = document.getElementById('fchip');
+  document.getElementById('fcount').textContent = n+' file'+(n>1?'s':'')+' ready';
+  chip.className = n>0 ? 'files-chip on' : 'files-chip';
+  const fl = document.getElementById('flist');
+  if(n>0){
+    fl.className = 'fscroll on';
+    fl.innerHTML = pdfs.map(f=>`<div class="frow"><div class="fdot"></div><span class="fname">${f.name}</span><span class="fsize">${(f.size/1024).toFixed(0)} KB</span></div>`).join('');
+  } else {
+    fl.className = 'fscroll';
+  }
+  document.getElementById('upBtn').disabled = n===0;
+  // Reset input so same file can be added again
+  inp.value = '';
+}
+
+async function uploadPDFs(){
+  const url=document.getElementById('uploadUrl').value.trim();
+  if(!url){st('upSt','Enter the upload webhook URL','err');return;}
+  if(!pdfs.length){st('upSt','Select PDF files first','err');return;}
+  st('upSt','Indexing '+pdfs.length+' document'+(pdfs.length>1?'s':'')+'…','');
+  document.getElementById('upBtn').disabled=true;
+  document.getElementById('upTxt').textContent='Indexing…';
+  const fd=new FormData();
+  pdfs.forEach((f,i)=>fd.append('pdf_'+i,f,f.name));
+  try{
+    await fetch(url,{method:'POST',body:fd});
+    document.getElementById('upBtn').className='btn btn-gold ok';
+    document.getElementById('upTxt').textContent='Knowledge base ready ✓';
+    document.getElementById('b1').className='step-badge done';
+    document.getElementById('b1').textContent='Step 01 ✓';
+    st('upSt','All documents indexed successfully','ok');
+  }catch(e){
+    st('upSt','Upload failed — '+e.message,'err');
+    document.getElementById('upBtn').disabled=false;
+    document.getElementById('upTxt').textContent='Index Knowledge Base';
+  }
+}
+
+async function toggleRec(){
+  if(!recording)await startRec();else stopRec();
+}
+
+async function startRec(){
+  const url=document.getElementById('queryUrl').value.trim();
+  if(!url){st('qSt','Enter the query webhook URL','err');return;}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    mr=new MediaRecorder(stream,{mimeType:mime});
+    chunks=[];
+    mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+    mr.onstop=()=>{
+      blob=new Blob(chunks,{type:mime});
+      setMic('done','Recorded','Searching knowledge base…');
+      document.getElementById('reRecBtn').className='btn-ghost on';
+      document.getElementById('b2').className='step-badge done';
+      document.getElementById('b2').textContent='Step 02 ✓';
+      st('qSt','Transcribing & querying…','');
+      sendQ();
+    };
+    mr.start();recording=true;
+    setMic('rec','Recording…','Tap to stop & send');
+    st('qSt','');
+  }catch(e){st('qSt','Microphone access denied','err');}
+}
+
+function stopRec(){
+  if(mr&&recording){mr.stop();mr.stream.getTracks().forEach(t=>t.stop());recording=false;}
+}
+
+function reRec(){
+  blob=null;recording=false;
+  setMic('','Tap to record','Tap again to stop & submit');
+  document.getElementById('reRecBtn').className='btn-ghost';
+  document.getElementById('ansPanel').className='answer-wrap';
+  st('qSt','');
+}
+
+async function sendQ(){
+  const url=document.getElementById('queryUrl').value.trim();
+  const fd=new FormData();
+  fd.append('audio',blob,'voice.webm');
+  try{
+    const res=await fetch(url,{method:'POST',body:fd});
+    const data=await res.json();
+    const reply=data.output||data.reply||data.text||data.message||data.content||JSON.stringify(data);
+    document.getElementById('ansTxt').textContent=reply;
+    document.getElementById('ansPanel').className='answer-wrap on';
+    st('qSt','Answer received','ok');
+    setMic('','Ask another question','Tap to record');
+  }catch(e){
+    st('qSt','Query failed — '+e.message,'err');
+    setMic('','Tap to try again','');
+  }
+}
+
+function setMic(state,lbl,sub){
+  document.getElementById('mring').className='mic-outer'+(state?' '+state:'');
+  document.getElementById('mlbl').textContent=lbl;
+  document.getElementById('msub').textContent=sub;
+  const c=state==='rec'?'var(--red)':state==='done'?'var(--green)':'var(--text2)';
+  document.querySelectorAll('#msvg rect,#msvg path,#msvg line').forEach(el=>{
+    if(el.hasAttribute('stroke'))el.setAttribute('stroke',c);
+  });
+}
+
+function st(id,msg,type=''){
+  const el=document.getElementById(id);
+  el.textContent=msg;
+  el.className='status'+(type?' '+type:'');
+}
+</script>
+</body>
+</html>
